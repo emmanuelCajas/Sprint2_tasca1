@@ -41,6 +41,7 @@ INSERT INTO Pedido VALUES (1,'2023-01-12 15:30:00','domicilio',12.1,1,1, null, n
 INSERT INTO Pedido VALUES (2,'2023-02-12 15:30:00','recojo',15.5,2,2,2,'2023-02-12 16:30:00');
 INSERT INTO Pedido VALUES (3,'2023-03-12 15:30:00','domicilio',16.4,3,1, null, null);
 INSERT INTO Pedido VALUES (4,'2023-01-12 15:30:00','domicilio',30.9,4,1, null, null);
+INSERT INTO Pedido VALUES (5,'2023-01-15 15:30:00','domicilio',30.9,4,1,3,'2023-01-15 15:30:00');
 SELECT * FROM Pedido;
 
 INSERT INTO Producto VALUES (1, 'bebida','cocacola', 'gaseosa', 'imagen1',1.1,null);
@@ -63,13 +64,17 @@ INSERT INTO Pedido_has_Producto VALUES (3,5,1);
 
 SELECT * FROM Pedido_has_Producto;
 
-SELECT DISTINCT p.*, l.localitat_nom AS localitat_venda
-FROM comanda AS c JOIN comanda_producte AS cp JOIN producte AS p JOIN `client` JOIN localitat AS l
-ON c.comanda_id = cp.comanda_id AND p.producte_id = cp.producte_id AND c.client_client_id = `client`.client_id AND `client`.localitat = l.localitat_id
-WHERE p.categoria LIKE 'Beguda' AND l.localitat_nom LIKE 'Barcelona';
+/*Lista cuántos productos de categoría 'Bebidas' se han vendido en una determinada localidad.*/
 
--- Llista quantes comandes ha efectuat un determinat empleat/da.
-SELECT e.nif, e.empleat_nom, e.empleat_cognoms, COUNT(c.comanda_id) as `# comandes`
-FROM comanda AS c JOIN empleat as e
-ON c.comanda_repartidor = e.nif
-GROUP BY e.nif;
+select prod.nombre_producto, prod.categoria_producto, loc.nombre_localidad, p.cantidad from pedido ped
+join tienda tie on ped.id_tienda = tie.id_tienda
+join localidad loc on tie.id_localidad = loc.id_localidad
+join Pedido_has_Producto p on ped.id_pedidos = p.pedido_id_pedidos
+join producto prod on p.producto_id_producto = prod.id_producto
+where prod.categoria_producto = 'bebida' and loc.nombre_localidad = 'Barcelona';
+
+/*Lista cuántos pedidos ha efectuado un determinado empleado/a.*/
+select * from empleado;
+select emp.nombre_empleado from pedido ped 
+join empleado emp on ped.id_empleado = emp.id_empleado
+where emp.tipo_empleado = 'repartidor';
